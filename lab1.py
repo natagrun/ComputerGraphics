@@ -57,8 +57,6 @@ def get_coordinates():
 
 def draw_triangle():
     get_coordinates()
-    canvas.delete("all")  # Очистить canvas
-
     draw_coord_lines()
     # Масштабируем координаты
     x1_scaled = canvas_x / 2 + x1 * scale
@@ -67,19 +65,15 @@ def draw_triangle():
     y2_scaled = canvas_y / 2 - y2 * scale
     x3_scaled = canvas_x / 2 + x3 * scale
     y3_scaled = canvas_y / 2 - y3 * scale
-
-    # Рисуем треугольник
     canvas.create_polygon(x1_scaled, y1_scaled, x2_scaled, y2_scaled, x3_scaled, y3_scaled, fill="lightblue")
-    # Вращение треугольника
 
 
 def roll_triangle():
     set_dot()
     get_coordinates()
-    canvas.delete("all")  # Очистить canvas
     draw_coord_lines()
     angle = float(entry_angle.get())
-    angle = math.radians(angle)  # Переводим угол из градусов в радианы
+    angle = math.radians(angle)
 
     mat1 = [[x1, y1, 1], [x2, y2, 1], [x3, y3, 1]]
     mat2 = [[1, 0, 0], [0, 1, 0], [dot_x * (-1), dot_y * (-1), 1]]
@@ -115,7 +109,7 @@ input_frame.grid(row=0, column=0, padx=10, pady=10)
 canvas_x = 600
 canvas_y = 600
 canvas = tk.Canvas(root, width=canvas_x, height=canvas_y)
-canvas.grid(row=0, column=2, padx=10, pady=10, rowspan=10, sticky="nsew")
+canvas.grid(row=0, column=2, padx=10, pady=10, columnspan=2, sticky="w")
 
 # Разделительная линия
 separator = tk.Frame(root, height=canvas_y, width=2, bg="black")
@@ -136,10 +130,10 @@ label1_x.grid(row=2, column=0)
 
 entry1_x = tk.Entry(input_frame)
 entry1_x.grid(row=2, column=0, columnspan=2)
-label1_y = tk.Label(input_frame, text="Y:")
+label1_y = tk.Label(input_frame, text="Y:  ")
 label1_y.grid(row=2, column=2)
 entry1_y = tk.Entry(input_frame)
-entry1_y.grid(row=2, column=3)
+entry1_y.grid(row=2, column=2, columnspan=2)
 
 label2 = tk.Label(input_frame, text="Точка 2:")
 label2.grid(row=3, column=0)
@@ -148,10 +142,10 @@ label2_x = tk.Label(input_frame, text="X:")
 label2_x.grid(row=4, column=0)
 entry2_x = tk.Entry(input_frame)
 entry2_x.grid(row=4, column=0, columnspan=2)
-label2_y = tk.Label(input_frame, text="Y:")
+label2_y = tk.Label(input_frame, text="Y:     ")
 label2_y.grid(row=4, column=2)
 entry2_y = tk.Entry(input_frame)
-entry2_y.grid(row=4, column=3)
+entry2_y.grid(row=4, column=2, columnspan=2)
 
 label3 = tk.Label(input_frame, text="Точка 3:")
 label3.grid(row=5, column=0)
@@ -160,10 +154,10 @@ label3_x = tk.Label(input_frame, text="X:")
 label3_x.grid(row=6, column=0)
 entry3_x = tk.Entry(input_frame)
 entry3_x.grid(row=6, column=0, columnspan=2)
-label3_y = tk.Label(input_frame, text="Y:")
+label3_y = tk.Label(input_frame,text="Y:     ")
 label3_y.grid(row=6, column=2)
 entry3_y = tk.Entry(input_frame)
-entry3_y.grid(row=6, column=3)
+entry3_y.grid(row=6, column=2, columnspan=2)
 
 button_draw = tk.Button(input_frame, text="Нарисовать", command=draw_triangle)
 
