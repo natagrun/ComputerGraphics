@@ -1,10 +1,8 @@
 import tkinter as tk
 from tkinter import messagebox
-
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-
 from bezier_functions import bernstein_poly
 
 
@@ -68,20 +66,16 @@ class BezierCurveApp(tk.Tk):
         return points_correct
 
     def add_point(self):
-        print('buttoned')
         new_point = Point(self.menu_frame)
         self.points.append(new_point)
         new_point.pack(side='top', fill="both", expand=False)
 
     def draw_curve(self):
-        self.canvas = None
-        plt.clf()
         if len(self.points) < 2:
             messagebox.showerror("Error", "At least 2 points are required to draw the Bezier curve")
             return
 
-        points = self.make_coordinates()
-        points = np.array(points)
+        points = np.array(self.make_coordinates())
 
         t = np.linspace(0, 1, 1000)
         curve_x = np.zeros_like(t)
@@ -102,11 +96,12 @@ class BezierCurveApp(tk.Tk):
             ax.plot([points[i][0], points[i + 1][0]], [points[i][1], points[i + 1][1]], 'k--')
 
         ax.legend()
-
-        # Create a canvas to embed the matplotlib figure
-        self.canvas = FigureCanvasTkAgg(fig, master=self)
+        if self.canvas == None:
+            self.canvas = FigureCanvasTkAgg(fig, master=self)
+        else:
+            self.canvas.get_tk_widget().destroy()
+            self.canvas = FigureCanvasTkAgg(fig, master=self)
         self.canvas.draw()
-
         self.canvas.get_tk_widget().pack(side="right", fill="both", expand=True)
 
 
