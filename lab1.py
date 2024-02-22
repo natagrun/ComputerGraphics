@@ -129,61 +129,62 @@ label1_x = tk.Label(input_frame, text="X:")
 label1_x.grid(row=2, column=0)
 
 entry1_x = tk.Entry(input_frame)
-entry1_x.grid(row=2, column=0, columnspan=2)
+entry1_x.grid(row=2, column=1)
+
 label1_y = tk.Label(input_frame, text="Y:  ")
-label1_y.grid(row=2, column=2)
+label1_y.grid(row=3, column=0)
 entry1_y = tk.Entry(input_frame)
-entry1_y.grid(row=2, column=2, columnspan=2)
+entry1_y.grid(row=3, column=1)
 
 label2 = tk.Label(input_frame, text="Точка 2:")
-label2.grid(row=3, column=0)
+label2.grid(row=4, column=0)
 
 label2_x = tk.Label(input_frame, text="X:")
-label2_x.grid(row=4, column=0)
+label2_x.grid(row=5, column=0)
 entry2_x = tk.Entry(input_frame)
-entry2_x.grid(row=4, column=0, columnspan=2)
+entry2_x.grid(row=5, column=1)
 label2_y = tk.Label(input_frame, text="Y:     ")
-label2_y.grid(row=4, column=2)
+label2_y.grid(row=6, column=0)
 entry2_y = tk.Entry(input_frame)
-entry2_y.grid(row=4, column=2, columnspan=2)
+entry2_y.grid(row=6, column=1)
 
 label3 = tk.Label(input_frame, text="Точка 3:")
-label3.grid(row=5, column=0)
+label3.grid(row=7, column=0)
 
 label3_x = tk.Label(input_frame, text="X:")
-label3_x.grid(row=6, column=0)
+label3_x.grid(row=8, column=0)
 entry3_x = tk.Entry(input_frame)
-entry3_x.grid(row=6, column=0, columnspan=2)
+entry3_x.grid(row=8, column=1)
 label3_y = tk.Label(input_frame,text="Y:     ")
-label3_y.grid(row=6, column=2)
+label3_y.grid(row=9, column=0)
 entry3_y = tk.Entry(input_frame)
-entry3_y.grid(row=6, column=2, columnspan=2)
+entry3_y.grid(row=9, column=1)
 
 button_draw = tk.Button(input_frame, text="Нарисовать", command=draw_triangle)
 
-button_draw.grid(row=7, columnspan=3)
+button_draw.grid(row=10, columnspan=3)
 
 label_angle = tk.Label(input_frame, text="Угол α:")
-label_angle.grid(row=8, column=0)  # Поле для ввода угла альфа
+label_angle.grid(row=11, column=0)  # Поле для ввода угла альфа
 entry_angle = tk.Entry(input_frame)
-entry_angle.grid(row=8, column=1)
+entry_angle.grid(row=11, column=1)
 button_scale = tk.Button(input_frame, text="Применить", command=roll_triangle)
-button_scale.grid(row=8, column=2)
+button_scale.grid(row=11, column=2)
 
 global dot_x
 global dot_y
 label_dot = tk.Label(input_frame, text="Точка для поворота:")
-label_dot.grid(row=9, column=0)
+label_dot.grid(row=12, column=0)
 label_dot_x = tk.Label(input_frame, text="X:")
-label_dot_x.grid(row=10, column=0)
+label_dot_x.grid(row=13, column=0)
 entry_dot_x = tk.Entry(input_frame)
-entry_dot_x.grid(row=10, column=1)
+entry_dot_x.grid(row=13, column=1)
 label_dot_y = tk.Label(input_frame, text="Y:")
-label_dot_y.grid(row=11, column=0)
+label_dot_y.grid(row=14, column=0)
 entry_dot_y = tk.Entry(input_frame)
-entry_dot_y.grid(row=11, column=1)
+entry_dot_y.grid(row=14, column=1)
 button_dot = tk.Button(input_frame, text="Применить координаты точки", command=set_dot)
-button_dot.grid(row=12, column=1)
+button_dot.grid(row=15, column=1)
 
 # Рисуем координатную ось
 canvas.create_line(10, canvas_y / 2, canvas_x - 10, canvas_y / 2, fill="black", arrow=tk.LAST)  # Ось x
