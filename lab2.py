@@ -1,6 +1,11 @@
 import tkinter as tk
-from tkinter import Canvas
 from tkinter import messagebox
+
+import numpy as np
+from matplotlib import pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+from bezier_functions import bernstein_poly
 
 
 class Point(tk.Frame):
@@ -30,29 +35,37 @@ class Point(tk.Frame):
     def confirm_coordinates(self):
         self.coordinates[0] = int(self.x_entry.get())
         self.coordinates[1] = int(self.y_entry.get())
+        self.x_entry.config(bg="lightgrey", fg="black")
+        self.y_entry.config(bg="lightgrey", fg="black")
 
 
 class BezierCurveApp(tk.Tk):
     def __init__(self):
         super().__init__()
 
+        self.canvas = None
         self.title("Bezier Curve App")
-        self.geometry("800x600")
-
+        self.geometry("1020x800")
+        self.figs = []
         self.points = []
         self.point_coordinates = []
 
         self.menu_frame = tk.Frame(self, width=200, height=600)
         self.menu_frame.pack(side="left", fill="y")
 
-        self.canvas = Canvas(self, width=600, height=600, bg="white")
-        self.canvas.pack(side="right", fill="both", expand=True)
-
         self.add_point_button = tk.Button(self.menu_frame, text="Add Point", command=self.add_point)
         self.add_point_button.pack(pady=20)
 
         self.draw_curve_button = tk.Button(self, text="Draw Bezier Curve", command=self.draw_curve)
         self.draw_curve_button.pack(side="bottom")
+
+    def make_coordinates(self):
+        points_correct = []
+        for i in range(len(self.points)):
+            a = [self.points[i].coordinates[0], self.points[i].coordinates[1]]
+            points_correct.append(a)
+        print(points_correct)
+        return points_correct
 
     def add_point(self):
         print('buttoned')
@@ -61,34 +74,40 @@ class BezierCurveApp(tk.Tk):
         new_point.pack(side='top', fill="both", expand=False)
 
     def draw_curve(self):
-
+        self.canvas = None
+        plt.clf()
         if len(self.points) < 2:
             messagebox.showerror("Error", "At least 2 points are required to draw the Bezier curve")
             return
-        self.canvas.delete('all')
-        # Draw x and y axis
-        self.canvas.create_line(50, 550, 750, 550, arrow=tk.LAST)
-        self.canvas.create_line(50, 550, 50, 50, arrow=tk.LAST)
 
-        # Add labels for x and y
-        for i in range(1, 15):
-            self.canvas.create_line(50 + i * 50, 550, 50 + i * 50, 545)
-            self.canvas.create_text(50 + i * 50, 560, text=str(i))
+        points = self.make_coordinates()
+        points = np.array(points)
 
-        for i in range(1, 11):
-            self.canvas.create_line(50, 550 - i * 50, 55, 550 - i * 50)
-            self.canvas.create_text(40, 550 - i * 50, text=str(i))
+        t = np.linspace(0, 1, 1000)
+        curve_x = np.zeros_like(t)
+        curve_y = np.zeros_like(t)
 
-        # Scale points for coordinate system
-        scaled_points = [(20 + point.coordinates[0] * 10, 550 - point.coordinates[1] * 10) for point in self.points]
+        for i in range(len(points)):
+            curve_x += points[i][0] * bernstein_poly(i, len(points) - 1, t)
+            curve_y += points[i][1] * bernstein_poly(i, len(points) - 1, t)
 
-        # Draw points
-        for point in scaled_points:
-            self.canvas.create_oval(point[0] - 5, point[1] - 5, point[0] + 5, point[1] + 5, fill="black")
-            self.canvas.create_line(scaled_points, fill="red", width=3)
+        fig, ax = plt.subplots()
+        ax.plot(curve_x, curve_y, label='Bezier Curve', color='blue')
+        ax.scatter(points[:, 0], points[:, 1], color='red')  # Отображение точек управления
+        for i, (x, y) in enumerate(points):
+            ax.text(x, y, f'P{i} ({x},{y})', fontsize=12, ha='right')
 
-        # Draw Bezier curve
-        self.canvas.create_line(scaled_points, smooth=True, fill="blue", width=3)
+        # Adding dashed lines connecting the control points
+        for i in range(len(points) - 1):
+            ax.plot([points[i][0], points[i + 1][0]], [points[i][1], points[i + 1][1]], 'k--')
+
+        ax.legend()
+
+        # Create a canvas to embed the matplotlib figure
+        self.canvas = FigureCanvasTkAgg(fig, master=self)
+        self.canvas.draw()
+
+        self.canvas.get_tk_widget().pack(side="right", fill="both", expand=True)
 
 
 if __name__ == "__main__":
