@@ -3,6 +3,8 @@ from tkinter import messagebox
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.pyplot import step
+
 from bezier_functions import bernstein_poly
 
 
@@ -148,10 +150,10 @@ class BezierCurveApp(tk.Tk):
         ])
 
         # Поворачиваем координаты точек A, B, C, D на угол alpha относительно оси X
-        A_rotated = np.dot(rotation_matrix_x, points[0])
-        B_rotated = np.dot(rotation_matrix_x, points[1])
-        C_rotated = np.dot(rotation_matrix_x, points[2])
-        D_rotated = np.dot(rotation_matrix_x, points[3])
+        # A_rotated = np.dot(rotation_matrix_x, points[0])
+        # B_rotated = np.dot(rotation_matrix_x, points[1])
+        # C_rotated = np.dot(rotation_matrix_x, points[2])
+        # D_rotated = np.dot(rotation_matrix_x, points[3])
 
         # Поворот билинейной поверхности относительно оси Y
         # Поворот билинейной поверхности относительно оси Y происходит аналогичным образом, заменить угол поворота и матрицу поворота
@@ -166,12 +168,34 @@ class BezierCurveApp(tk.Tk):
 
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
-        ax.plot_surface(x, y, z, alpha=0.5)
-        ax.scatter(A_rotated[0], A_rotated[1], A_rotated[2], color='r', marker='o')  # точка A
-        ax.scatter(B_rotated[0], B_rotated[1], B_rotated[2], color='g', marker='o')  # точка B
-        ax.scatter(C_rotated[0], C_rotated[1], C_rotated[2], color='b', marker='o')  # точка C
-        ax.scatter(D_rotated[0], D_rotated[1], D_rotated[2], color='y', marker='o')  # точка D
+        # ax.plot_surface(x, y, z, alpha=0.5)
+        # ax.scatter(A_rotated[0], A_rotated[1], A_rotated[2], color='r', marker='o')  # точка A
+        # ax.scatter(B_rotated[0], B_rotated[1], B_rotated[2], color='g', marker='o')  # точка B
+        # ax.scatter(C_rotated[0], C_rotated[1], C_rotated[2], color='b', marker='o')  # точка C
+        # ax.scatter(D_rotated[0], D_rotated[1], D_rotated[2], color='y', marker='o')  # точка D
 
+        a, b, c, d = coefficients
+        min_x = min(points, key=lambda p: p[0])[0]
+        max_x = max(points, key=lambda p: p[0])[0]
+        min_y = min(points, key=lambda p: p[1])[1]
+        max_y = max(points, key=lambda p: p[1])[1]
+
+        # Создаем сетку значений x и y
+        x = np.arange(min_x, max_x, 1)
+        y = np.arange(min_y, max_y, 1)
+        x, y = np.meshgrid(x, y)
+
+
+        # Вычисляем значения Z для данной сетки
+        z = a + b * x + c * y + d * x * y
+
+        # Строим поверхность
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.plot_surface(x, y, z, rstride=1, cstride=1, cmap='viridis')
+
+        # Отображаем график
+        # plt.show()
 
         ax.legend()
         if self.canvas is None:
@@ -182,6 +206,6 @@ class BezierCurveApp(tk.Tk):
         self.canvas.draw()
         self.canvas.get_tk_widget().pack(side="right", fill="both", expand=True)
 
-        if __name__ == "__main__":
-            app = BezierCurveApp()
-        app.mainloop()
+if __name__ == "__main__":
+    app = BezierCurveApp()
+    app.mainloop()
