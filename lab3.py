@@ -102,102 +102,73 @@ class BezierCurveApp(tk.Tk):
 
         points = np.array(self.make_coordinates())
 
-        x = [0, 0, 0, 0]
-        y = [0, 0, 0, 0]
-        z = [0, 0, 0, 0]
-        coords = [x, y, z]
-        print('points\n', points)
-        for i in range(len(coords)):
-            for j in range(len(points)):
-                coords[i][j] = points[j][i]
-        print('coordc\n', coords)
-
-        # Формирование матрицы коэффициентов для билинейной поверхности
-        # Уравнение билинейной поверхности имеет вид:
-        # F(x, y) = a + b*x + c*y + d*x*y
-        # Где a, b, c, d - коэффициенты, которые нужно найти
-        # Преобразуем уравнение в вид матрицы:
-        # |1 x1 y1 x1*y1|   |a|   |z1|
-        # |1 x2 y2 x2*y2| * |b| = |z2|
-        # |1 x3 y3 x3*y3|   |c|   |z3|
-        # |1 x4 y4 x4*y4|   |d|   |z4|
-
-        # Формируем матрицу коэффициентов A
-        A_matrix = np.array([
-            [1, points[0][0], points[0][1], points[0][0] * points[0][1]],
-            [1, points[1][0], points[1][1], points[1][0] * points[1][1]],
-            [1, points[2][0], points[2][1], points[2][0] * points[2][1]],
-            [1, points[3][0], points[3][1], points[3][0] * points[3][1]]
-        ])
-
-        # Формируем матрицу значений Z
-        Z_matrix = np.array([points[0][2], points[1][2], points[2][2], points[3][2]])
-
-        # Находим коэффициенты a, b, c, d решая систему линейных уравнений
-        coefficients = np.linalg.solve(A_matrix, Z_matrix)
-
-        # Поворот билинейной поверхности относительно оси X
-        # Для поворота билинейной поверхности относительно оси X на угол alpha, мы можем использовать матрицу поворота:
-        # |1    0      0|   |x|   |x'|
-        # |0  cos(a) -sin(a)| * |y| = |y'|
-        # |0  sin(a)  cos(a)|   |z|   |z'|
-
-        alpha = np.radians(45)  # Угол поворота в радианах
-        rotation_matrix_x = np.array([
-            [1, 0, 0],
-            [0, np.cos(alpha), -np.sin(alpha)],
-            [0, np.sin(alpha), np.cos(alpha)]
-        ])
-
-        # Поворачиваем координаты точек A, B, C, D на угол alpha относительно оси X
-        # A_rotated = np.dot(rotation_matrix_x, points[0])
-        # B_rotated = np.dot(rotation_matrix_x, points[1])
-        # C_rotated = np.dot(rotation_matrix_x, points[2])
-        # D_rotated = np.dot(rotation_matrix_x, points[3])
-
-        # Поворот билинейной поверхности относительно оси Y
-        # Поворот билинейной поверхности относительно оси Y происходит аналогичным образом, заменить угол поворота и матрицу поворота
-        # alpha_y = np.radians(30)  # Угол поворота в радианах
-        # rotation_matrix_y = np.array([
-        #     [np.cos(alpha_y), 0, np.sin(alpha_y)],
-        #     [0, 1, 0],
-        #     [-np.sin(alpha_y), 0, np.cos(alpha_y)]
-        # ])
+        # x = [0, 0, 0, 0]
+        # y = [0, 0, 0, 0]
+        # z = [0, 0, 0, 0]
+        # coords = [x, y, z]
+        # print('points\n', points)
+        # for i in range(len(coords)):
+        #     for j in range(len(points)):
+        #         coords[i][j] = points[j][i]
+        # print('coordc\n', coords)
 
         fig, ax = plt.subplots()
 
+        u = np.linspace(0, 1, 100)  # параметр u
+        v = np.linspace(0, 1, 100)  # параметр v
+        x_values = []
+
+        x1 = points[0][0]
+        x2 = points[1][0]
+        x3 = points[2][0]
+        x4 = points[3][0]
+        for i in range(len(u)):
+            for j in range(len(v)):
+                x = x1 * (1 - u[i]) * (1 - v[j]) + x2 * v[j] * (1 - u[i]) + x3 * (1 - v[j]) * u[i] + x4 * u[i] * v[j]
+                x_values.append(x)
+
+        y_values = []
+
+        y1 = points[0][0]
+        y2 = points[1][0]
+        y3 = points[2][0]
+        y4 = points[3][0]
+        for i in range(len(u)):
+            for j in range(len(v)):
+                y = y1 * (1 - u[i]) * (1 - v[j]) + y2 * v[j] * (1 - u[i]) + y3 * (1 - v[j]) * u[i] + y4 * u[i] * v[j]
+                y_values.append(y)
+
+        z_values = []
+
+        z1 = points[0][0]
+        z2 = points[1][0]
+        z3 = points[2][0]
+        z4 = points[3][0]
+        for i in range(len(u)):
+            for j in range(len(v)):
+                z = z1 * (1 - u[i]) * (1 - v[j]) + z2 * v[j] * (1 - u[i]) + z3 * (1 - v[j]) * u[i] + z4 * u[i] * v[j]
+                z_values.append(z)
+
+
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
-        # ax.plot_surface(x, y, z, alpha=0.5)
-        # ax.scatter(A_rotated[0], A_rotated[1], A_rotated[2], color='r', marker='o')  # точка A
-        # ax.scatter(B_rotated[0], B_rotated[1], B_rotated[2], color='g', marker='o')  # точка B
-        # ax.scatter(C_rotated[0], C_rotated[1], C_rotated[2], color='b', marker='o')  # точка C
-        # ax.scatter(D_rotated[0], D_rotated[1], D_rotated[2], color='y', marker='o')  # точка D
-
-        a, b, c, d = coefficients
-        min_x = min(points, key=lambda p: p[0])[0]
-        max_x = max(points, key=lambda p: p[0])[0]
-        min_y = min(points, key=lambda p: p[1])[1]
-        max_y = max(points, key=lambda p: p[1])[1]
-
-        # Создаем сетку значений x и y
-        x = np.arange(min_x, max_x, 1)
-        y = np.arange(min_y, max_y, 1)
-        x, y = np.meshgrid(x, y)
 
 
-        # Вычисляем значения Z для данной сетки
-        z = a + b * x + c * y + d * x * y
+        u_mesh, v_mesh = np.meshgrid(u, v)
+        x_mesh = np.array(x_values).reshape((100, 100))  # assuming you have 100 points in u and v
+        y_mesh = np.array(y_values).reshape((100, 100))  # assuming you have 100 points in u and v
+        z_mesh = np.array(z_values).reshape((100, 100))  # assuming you have 100 points in u and v
 
-        # Строим поверхность
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
-        ax.plot_surface(x, y, z, rstride=1, cstride=1, cmap='viridis')
 
-        # Отображаем график
-        # plt.show()
 
-        ax.legend()
+        surf = ax.plot_surface(u_mesh, v_mesh, x_mesh, cmap='pink')
+
+
+
+        #поворот по х
+        # ax.view_init(elev=20, azim=30)
+
+        # ax.legend()
         if self.canvas is None:
             self.canvas = FigureCanvasTkAgg(fig, master=self)
         else:
@@ -205,6 +176,11 @@ class BezierCurveApp(tk.Tk):
         self.canvas = FigureCanvasTkAgg(fig, master=self)
         self.canvas.draw()
         self.canvas.get_tk_widget().pack(side="right", fill="both", expand=True)
+
+    def mat_number(self, matrix, num):
+        for i in range(len(matrix)):
+            matrix[i] *= num
+
 
 if __name__ == "__main__":
     app = BezierCurveApp()
