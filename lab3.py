@@ -26,6 +26,11 @@ class Point(tk.Frame):
         self.x_entry = tk.Entry(self.x_frame)
         self.x_entry.pack(side='right')
 
+        self.fig = plt.figure()
+        self.ax = self.fig.add_subplot(111, projection='3d')
+
+
+
         self.x_frame.pack()
 
         self.y_frame = tk.Frame(self, width=50, height=25)
@@ -58,6 +63,8 @@ class BezierCurveApp(tk.Tk):
     def __init__(self):
         super().__init__()
 
+        self.ax = None
+        self.fig = None
         self.canvas = None
         self.title("Bezier Curve App")
         self.geometry("1020x800")
@@ -95,6 +102,11 @@ class BezierCurveApp(tk.Tk):
         print(points_correct)
         return points_correct
 
+
+    def flip_by_x(self):
+        goida = 'ZZZVVV'
+
+
     def draw_curve(self):
         if len(self.points) < 2:
             messagebox.showerror("Error", "At least 2 points are required to draw the Bezier curve")
@@ -102,17 +114,6 @@ class BezierCurveApp(tk.Tk):
 
         points = np.array(self.make_coordinates())
 
-        # x = [0, 0, 0, 0]
-        # y = [0, 0, 0, 0]
-        # z = [0, 0, 0, 0]
-        # coords = [x, y, z]
-        # print('points\n', points)
-        # for i in range(len(coords)):
-        #     for j in range(len(points)):
-        #         coords[i][j] = points[j][i]
-        # print('coordc\n', coords)
-
-        fig, ax = plt.subplots()
 
         u = np.linspace(0, 1, 100)  # параметр u
         v = np.linspace(0, 1, 100)  # параметр v
@@ -129,10 +130,10 @@ class BezierCurveApp(tk.Tk):
 
         y_values = []
 
-        y1 = points[0][0]
-        y2 = points[1][0]
-        y3 = points[2][0]
-        y4 = points[3][0]
+        y1 = points[0][1]
+        y2 = points[1][1]
+        y3 = points[2][1]
+        y4 = points[3][1]
         for i in range(len(u)):
             for j in range(len(v)):
                 y = y1 * (1 - u[i]) * (1 - v[j]) + y2 * v[j] * (1 - u[i]) + y3 * (1 - v[j]) * u[i] + y4 * u[i] * v[j]
@@ -140,40 +141,35 @@ class BezierCurveApp(tk.Tk):
 
         z_values = []
 
-        z1 = points[0][0]
-        z2 = points[1][0]
-        z3 = points[2][0]
-        z4 = points[3][0]
+        z1 = points[0][2]
+        z2 = points[1][2]
+        z3 = points[2][2]
+        z4 = points[3][2]
         for i in range(len(u)):
             for j in range(len(v)):
                 z = z1 * (1 - u[i]) * (1 - v[j]) + z2 * v[j] * (1 - u[i]) + z3 * (1 - v[j]) * u[i] + z4 * u[i] * v[j]
                 z_values.append(z)
 
 
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
-
 
         u_mesh, v_mesh = np.meshgrid(u, v)
         x_mesh = np.array(x_values).reshape((100, 100))  # assuming you have 100 points in u and v
         y_mesh = np.array(y_values).reshape((100, 100))  # assuming you have 100 points in u and v
         z_mesh = np.array(z_values).reshape((100, 100))  # assuming you have 100 points in u and v
+        # x_mesh, y_mesh = np.meshgrid(x_mesh, y_mesh)
 
+        surf = self.ax.plot_surface(z_mesh, y_mesh, x_mesh, cmap='pink')
 
-
-        surf = ax.plot_surface(u_mesh, v_mesh, x_mesh, cmap='pink')
-
-
-
-        #поворот по х
-        # ax.view_init(elev=20, azim=30)
+        self.ax.set_xlabel("X", loc='right')
+        self.ax.set_ylabel("Y")
+        self.ax.set_zlabel("Z")
 
         # ax.legend()
         if self.canvas is None:
-            self.canvas = FigureCanvasTkAgg(fig, master=self)
+            self.canvas = FigureCanvasTkAgg(self.fig, master=self)
         else:
             self.canvas.get_tk_widget().destroy()
-        self.canvas = FigureCanvasTkAgg(fig, master=self)
+        self.canvas = FigureCanvasTkAgg(self.fig, master=self)
         self.canvas.draw()
         self.canvas.get_tk_widget().pack(side="right", fill="both", expand=True)
 
