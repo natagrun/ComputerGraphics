@@ -1,3 +1,4 @@
+import math
 import tkinter as tk
 from tkinter import messagebox
 import numpy as np
@@ -25,11 +26,6 @@ class Point(tk.Frame):
         x_label.pack(side="left")
         self.x_entry = tk.Entry(self.x_frame)
         self.x_entry.pack(side='right')
-
-        self.fig = plt.figure()
-        self.ax = self.fig.add_subplot(111, projection='3d')
-
-
 
         self.x_frame.pack()
 
@@ -63,19 +59,18 @@ class BezierCurveApp(tk.Tk):
     def __init__(self):
         super().__init__()
 
-        self.ax = None
         self.fig = None
+        self.ax = None
         self.canvas = None
-        self.title("Bezier Curve App")
+        self.title("App")
         self.geometry("1020x800")
-        self.figs = []
         self.points = []
         self.point_coordinates = []
 
         self.menu_frame = tk.Frame(self, width=200, height=600)
         self.menu_frame.pack(side="left", fill="y")
 
-        self.draw_curve_button = tk.Button(self, text="Draw Bezier Curve", command=self.draw_curve)
+        self.draw_curve_button = tk.Button(self, text="Draw", command=self.draw_curve)
         self.draw_curve_button.pack(side="bottom")
 
         point1 = Point(self.menu_frame)
@@ -94,6 +89,9 @@ class BezierCurveApp(tk.Tk):
         self.points.append(point4)
         point4.pack(side='top', fill="both", expand=False)
 
+        self.flip_by_x_button = tk.Button(self, text="Flip by Y", command=self.flip_by_y)
+        self.flip_by_x_button.pack(side="bottom")
+
     def make_coordinates(self):
         points_correct = []
         for i in range(len(self.points)):
@@ -102,10 +100,19 @@ class BezierCurveApp(tk.Tk):
         print(points_correct)
         return points_correct
 
-
-    def flip_by_x(self):
+    def flip_by_y(self):
         goida = 'ZZZVVV'
+        self.rotate_x(math.pi / 2)
+        self.draw_curve()
 
+    def rotate_x(self, theta):
+        points = np.array(self.make_coordinates())
+        rotation_matrix = np.array([
+            [1, 0, 0],
+            [0, math.cos(theta), -math.sin(theta)],
+            [0, math.sin(theta), math.cos(theta)]
+        ])
+        return np.dot(points, rotation_matrix.T)
 
     def draw_curve(self):
         if len(self.points) < 2:
@@ -113,7 +120,6 @@ class BezierCurveApp(tk.Tk):
             return
 
         points = np.array(self.make_coordinates())
-
 
         u = np.linspace(0, 1, 100)  # параметр u
         v = np.linspace(0, 1, 100)  # параметр v
@@ -150,32 +156,33 @@ class BezierCurveApp(tk.Tk):
                 z = z1 * (1 - u[i]) * (1 - v[j]) + z2 * v[j] * (1 - u[i]) + z3 * (1 - v[j]) * u[i] + z4 * u[i] * v[j]
                 z_values.append(z)
 
-
-
-        u_mesh, v_mesh = np.meshgrid(u, v)
         x_mesh = np.array(x_values).reshape((100, 100))  # assuming you have 100 points in u and v
         y_mesh = np.array(y_values).reshape((100, 100))  # assuming you have 100 points in u and v
         z_mesh = np.array(z_values).reshape((100, 100))  # assuming you have 100 points in u and v
         # x_mesh, y_mesh = np.meshgrid(x_mesh, y_mesh)
 
-        surf = self.ax.plot_surface(z_mesh, y_mesh, x_mesh, cmap='pink')
+
+
+        if self.canvas is not None:
+            print("ПАОНАХУЙ")
+            self.fig.clf()
+            self.canvas.get_tk_widget().pack_forget()
+            self.canvas.get_tk_widget().destroy()
+
+
+
+        self.fig = plt.figure()
+        self.ax = self.fig.add_subplot(111, projection='3d')
+        surf = self.ax.plot_surface(x_mesh, y_mesh, z_mesh, cmap='spring')
 
         self.ax.set_xlabel("X", loc='right')
         self.ax.set_ylabel("Y")
         self.ax.set_zlabel("Z")
 
-        # ax.legend()
-        if self.canvas is None:
-            self.canvas = FigureCanvasTkAgg(self.fig, master=self)
-        else:
-            self.canvas.get_tk_widget().destroy()
+
         self.canvas = FigureCanvasTkAgg(self.fig, master=self)
         self.canvas.draw()
         self.canvas.get_tk_widget().pack(side="right", fill="both", expand=True)
-
-    def mat_number(self, matrix, num):
-        for i in range(len(matrix)):
-            matrix[i] *= num
 
 
 if __name__ == "__main__":
